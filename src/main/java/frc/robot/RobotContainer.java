@@ -7,12 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.commands.ArcadeDrive;
-import frc.robot.commands.AutonomousDistance;
-import frc.robot.commands.AutonomousTime;
 import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.OnBoardIO;
-import frc.robot.subsystems.OnBoardIO.ChannelMode;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,13 +23,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final Drivetrain m_drivetrain = new Drivetrain();
-  private final OnBoardIO m_onboardIO = new OnBoardIO(ChannelMode.INPUT, ChannelMode.INPUT);
-
-  // Assumes a gamepad plugged into channnel 0
-  private final Joystick m_controller = new Joystick(0);
-
-  // Create SmartDashboard chooser for autonomous routines
-  private final SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   // NOTE: The I/O pin functionality of the 5 exposed I/O pins depends on the hardware "overlay"
   // that is specified when launching the wpilib-ws server on the Romi raspberry pi.
@@ -60,20 +48,6 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // Default command is arcade drive. This will run unless another command
-    // is scheduled over it.
-    m_drivetrain.setDefaultCommand(getArcadeDriveCommand());
-
-    // Example of how to use the onboard IO
-    Trigger onboardButtonA = new Trigger(m_onboardIO::getButtonAPressed);
-    onboardButtonA
-        .onTrue(new PrintCommand("Button A Pressed"))
-        .onFalse(new PrintCommand("Button A Released"));
-
-    // Setup SmartDashboard options
-    m_chooser.setDefaultOption("Auto Routine Distance", new AutonomousDistance(m_drivetrain));
-    m_chooser.addOption("Auto Routine Time", new AutonomousTime(m_drivetrain));
-    SmartDashboard.putData(m_chooser);
   }
 
   /**
@@ -82,16 +56,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return m_chooser.getSelected();
+    return null;
   }
 
-  /**
-   * Use this to pass the teleop command to the main {@link Robot} class.
-   *
-   * @return the command to run in teleop
-   */
-  public Command getArcadeDriveCommand() {
-    return new ArcadeDrive(
-        m_drivetrain, () -> -m_controller.getRawAxis(1), () -> -m_controller.getRawAxis(2));
-  }
 }
