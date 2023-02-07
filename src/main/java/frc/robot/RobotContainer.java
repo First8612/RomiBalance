@@ -5,14 +5,12 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.robot.subsystems.Drivetrain;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.commands.BalanceCommand;
+import edu.wpi.first.wpilibj.romi.RomiGyro;
+import frc.robot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -22,23 +20,17 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final Drivetrain m_drivetrain = new Drivetrain();
+  private final RomiGyro m_gyro = new RomiGyro();
+  private final Drivetrain m_drivetrain = new Drivetrain(m_gyro);
 
-  // NOTE: The I/O pin functionality of the 5 exposed I/O pins depends on the hardware "overlay"
-  // that is specified when launching the wpilib-ws server on the Romi raspberry pi.
-  // By default, the following are available (listed in order from inside of the board to outside):
-  // - DIO 8 (mapped to Arduino pin 11, closest to the inside of the board)
-  // - Analog In 0 (mapped to Analog Channel 6 / Arduino Pin 4)
-  // - Analog In 1 (mapped to Analog Channel 2 / Arduino Pin 20)
-  // - PWM 2 (mapped to Arduino Pin 21)
-  // - PWM 3 (mapped to Arduino Pin 22)
-  //
-  // Your subsystem configuration should take the overlays into account
-
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+  }
+
+  public void collectTelemetry() {
+    SmartDashboard.putNumber("Angle", m_gyro.getAngleY());
+    SmartDashboard.putNumber("Distance", m_drivetrain.getAverageDistanceInch());
   }
 
   /**
@@ -56,7 +48,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return null;
+    m_gyro.reset();
+    return new BalanceCommand(m_gyro, m_drivetrain);
   }
-
 }
